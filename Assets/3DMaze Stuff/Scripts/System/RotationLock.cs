@@ -6,6 +6,6 @@ public class RotationLock : MonoBehaviour {
 
     float lockPos = 0;
     void Update() {
-        transform.rotation = Quaternion.Euler(lockPos, transform.rotation.eulerAngles.y, lockPos);
+            transform.rotation = Quaternion.Euler(lockPos, transform.rotation.eulerAngles.y, lockPos);
     }
 }
