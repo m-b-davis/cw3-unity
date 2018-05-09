@@ -5,14 +5,21 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour {
 
-	public float MoveSpeed;
-	public float RotateSpeed;
+	public float moveSpeed;
+	public float rotateSpeed;
+    public float jumpForce;
 
-	private bool isGrounded = false;
-	private Rigidbody rigidBody;
+    private int gridSize = 7;
 
-	public Vector3 jump;
-	public float jumpForce = 10.0f;
+    private float timer = 0;
+
+    private bool isGrounded = false;
+    private bool isMoving = false;
+
+    private int movementIterator = 0;
+
+    private Vector3 jump, startPosition, endPosition, input;
+    private Rigidbody rigidBody;
 
 
 
@@ -22,16 +29,11 @@ public class PlayerController : MonoBehaviour {
 		this.jump = new Vector3 (0.0f, this.jumpForce, 0);
 	}
 
-
-
 	void Spawn() {
 		this.gameObject.transform.position = new Vector3 (4, 0.5f, 4);
 	}
 	
-    	
-
-	void OnCollisionStay()
-	{
+	void OnCollisionStay() {
 		isGrounded = true;
 	}
 	
@@ -39,43 +41,119 @@ public class PlayerController : MonoBehaviour {
 
 	void Update () {
 
-        /* THIS ENTIRE METHOD NEEDS TO BE SURROUNDED WITH A CHECK TO SEE IF IT'S NOT */
-        /* ALREADY MOVING, AND THAT ITS POSITION IS A ROUND NUMBER (I.E. IT'S ON THE GRID) */
-        //TODO Check if "on grid" and readjust to nearest floor cube's x and z if not
+        //DONE Check if "on grid" and readjust to nearest floor cube's x and z if not
         //TODO Add 4-D rotation using the second joystick and angle checker (might need direction indicator in-game)
+        //TODO MOVEMENT NEEDS DIRECTIONAL OBSTACLE CHECK AS EXTRA CONDITION
 
-        if ((Input.GetKeyDown(KeyCode.Space)) && isGrounded){
+        if ((Input.GetKeyDown(KeyCode.Space) || (Input.GetKeyDown(KeyCode.Joystick1Button0 /*'A' button*/))) && isGrounded) {
 
 			this.rigidBody.AddForce(jump * jumpForce, ForceMode.Impulse);
 			isGrounded = false;
 		}
 
-        //left joystick
-        var x = Input.GetAxis("Horizontal") * Time.deltaTime;
-        var z = Input.GetAxis("Vertical") * Time.deltaTime;
 
-        //right joystick
-        var x2 = Input.GetAxis("Horizontal2") * Time.deltaTime * RotateSpeed;
-        var z2 = Input.GetAxis("Vertical2") * Time.deltaTime * RotateSpeed;
 
-        Debug.Log(x + " " + z);
+                /* LEFT JOYSTICK (MOVEMENT) */
 
-        float xz = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)) * MoveSpeed; //diagonal speed
+        float x = Input.GetAxis("Horizontal") * Time.deltaTime;
+        float z = Input.GetAxis("Vertical") * Time.deltaTime;
+        //float xz = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)) * MoveSpeed; //diagonal speed
+
+        //float firstVal = 0;
+        //float secondVal = 0;
+        //float thirdVal = 0;
+
+        Vector3 direction = new Vector3(0, 0, 0);
+
+        Debug.Log(isMoving);
+
+        input = new Vector3(Input.GetAxis("Horizontal"),0 , Input.GetAxis("Vertical"));
 
         //left joystick angular check
-        if (x > 0) {
-            if (z > 0) 
-                transform.Translate(xz, 0, 0);
-            else if (z < 0)
-                transform.Translate(0, 0, -xz);
-        } else if (x < 0) {
-            if (z > 0)
-                transform.Translate(0, 0, xz);
-            else if (z < 0)
-                transform.Translate(-xz, 0, 0);
+        if (!isMoving) { //if not moving already, get requested direction of movement from input
+            if (x >= 0) {
+                if (z >= 0)
+                    direction = Vector3.right;
+                else if (z <= 0)
+                    direction = -Vector3.forward;
+            } else if (x <= 0) {
+                if (z >= 0)
+                    direction = Vector3.forward;
+                else if (z <= 0)
+                    direction = -Vector3.right;
+            }
+            if (input != Vector3.zero)
+                StartCoroutine(move(direction));
         }
-        
+
+
+
+                /* RIGHT JOYSTICK (ROTATION) */
+
+        float x2 = Input.GetAxis("Horizontal2") * Time.deltaTime * rotateSpeed;
+        float z2 = Input.GetAxis("Vertical2") * Time.deltaTime * rotateSpeed;
         //transform.Rotate(0, z2, 0);
 
     }
+
+    public IEnumerator move(Vector3 direction)
+    {
+        isMoving = true;
+        Debug.Log("hello");
+        startPosition = transform.position;
+        endPosition = transform.position + direction;
+        timer = 0;
+
+        while (timer < 1f)
+        {
+            timer += Time.deltaTime * (moveSpeed / gridSize);
+            transform.position = Vector3.Lerp(startPosition, endPosition, timer);
+            yield return null;
+        }
+
+        isMoving = false;
+        yield return 0;
+    }
 }
+
+
+/*
+//left joystick angular check
+        if (!isMoving) { //if not moving already, get requested direction of movement from input
+            if (x > 0) {
+                if (z > 0) {
+                    firstVal = xz;
+                    secondVal = 0;
+                    thirdVal = 0;
+                    isMoving = true;
+                } else if (z < 0) {
+                    firstVal = 0;
+                    secondVal = 0;
+                    thirdVal = -xz;
+                    isMoving = true;
+                }
+            } else if (x < 0) {
+                if (z > 0) {
+                    firstVal = 0;
+                    secondVal = 0;
+                    thirdVal = xz;
+                    isMoving = true;
+                } else if (z < 0) {
+                    firstVal = -xz;
+                    secondVal = 0;
+                    thirdVal = 0;
+                    isMoving = true;
+                }
+            }
+        } else {
+            Debug.Log(movementIterator);
+            if (movementIterator < 10)
+            {
+                transform.Translate(firstVal, secondVal, thirdVal);
+            } else {
+                isMoving = false;
+                movementIterator = 0;
+            }
+            movementIterator++;
+        } 
+*/
