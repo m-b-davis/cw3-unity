@@ -18,17 +18,19 @@ public class PlayerController : MonoBehaviour {
 	private Vector3 Direction;
 
 	// Use this for initialization
+
 	void Start () {
-		this.Spawn ();	
+		this.Spawn();	
 		this.rigidBody = GetComponent<Rigidbody> ();
 		this.rigidBody.freezeRotation = true;
 		this.jump = new Vector3 (0.0f, this.jumpForce, 0);
 	}
 
+
+
 	void Spawn() {
-		this.gameObject.transform.position = new Vector3 (0, 1.2f, 0);
+		this.gameObject.transform.position = new Vector3 (4, 0.5f, 4);
 	}
-		
 
 	void OnCollisionStay()
 	{
@@ -38,22 +40,6 @@ public class PlayerController : MonoBehaviour {
 	void HitBlock(Collision collision) {
 		var blockController = collision.gameObject.GetComponent<BlockController> ();
 		var parentController = blockController.parent;
-
-		// Calculate Angle Between the collision point and the player
-		Vector3 dir = collision.contacts[0].point - transform.position;
-//		Debug.Log ("Before rounding hitblock:");
-//		Debug.Log (dir.x);
-//		Debug.Log (dir.y);
-//		Debug.Log (dir.z);
-//
-//		dir.x = Mathf.Round(dir.x / 90) * 90;
-//		dir.y = Mathf.Round(dir.y / 90) * 90;
-//		dir.z = Mathf.Round(dir.z / 90) * 90;
-//
-//		Debug.Log ("Direction hitblock:");
-//		Debug.Log (dir.x);
-//		Debug.Log (dir.y);
-//		Debug.Log (dir.z);
 
 		if (parentController.CanMove (this.Direction)) {
 			parentController.Move (this.Direction, amount: 1);
@@ -94,12 +80,17 @@ public class PlayerController : MonoBehaviour {
 			}
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
-		if (Input.GetKeyDown(KeyCode.Space) && isGrounded){
 
-			this.rigidBody.AddForce(jump * jumpForce, ForceMode.Acceleration);
+	void Update () {
+
+		/* THIS ENTIRE METHOD NEEDS TO BE SURROUNDED WITH A CHECK TO SEE IF IT'S NOT */
+		/* ALREADY MOVING, AND THAT ITS POSITION IS A ROUND NUMBER (I.E. IT'S ON THE GRID) */
+		//TODO Check if "on grid" and readjust to nearest floor cube's x and z if not
+		//TODO Add 4-D rotation using the second joystick and angle checker (might need direction indicator in-game)
+
+		if ((Input.GetKeyDown (KeyCode.Space)) && isGrounded) {
+
+			this.rigidBody.AddForce (jump * jumpForce, ForceMode.Acceleration);
 			isGrounded = false;
 		}
 
@@ -115,3 +106,35 @@ public class PlayerController : MonoBehaviour {
 		);
 	}
 }
+
+
+//=======
+//        //left joystick
+//        var x = Input.GetAxis("Horizontal") * Time.deltaTime;
+//        var z = Input.GetAxis("Vertical") * Time.deltaTime;
+//
+//        //right joystick
+//        var x2 = Input.GetAxis("Horizontal2") * Time.deltaTime * RotateSpeed;
+//        var z2 = Input.GetAxis("Vertical2") * Time.deltaTime * RotateSpeed;
+//
+//        Debug.Log(x + " " + z);
+//
+//        float xz = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)) * MoveSpeed; //diagonal speed
+//
+//        //left joystick angular check
+//        if (x > 0) {
+//            if (z > 0) 
+//                transform.Translate(xz, 0, 0);
+//            else if (z < 0)
+//                transform.Translate(0, 0, -xz);
+//        } else if (x < 0) {
+//            if (z > 0)
+//                transform.Translate(0, 0, xz);
+//            else if (z < 0)
+//                transform.Translate(-xz, 0, 0);
+//        }
+//        
+//        //transform.Rotate(0, z2, 0);
+//
+//    }
+
