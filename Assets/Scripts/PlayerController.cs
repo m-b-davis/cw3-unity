@@ -63,15 +63,15 @@ public class PlayerController : MonoBehaviour {
         float xz = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)) * MoveSpeed; //diagonal speed
 
         //left joystick angular check
-        if (x > 0.001f) {
-            if (z > 0.001f) 
+        if (x > 0) {
+            if (z > 0) 
                 transform.Translate(xz, 0, 0);
-            else if (z < -0.001f)
+            else if (z < 0)
                 transform.Translate(0, 0, -xz);
-        } else if (x < -0.001f) {
-            if (z > 0.001f)
+        } else if (x < 0) {
+            if (z > 0)
                 transform.Translate(0, 0, xz);
-            else if (z < -0.001f)
+            else if (z < 0)
                 transform.Translate(-xz, 0, 0);
         }
         
