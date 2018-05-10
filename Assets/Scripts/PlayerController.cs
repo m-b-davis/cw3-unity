@@ -183,6 +183,9 @@ public class PlayerController : MonoBehaviour {
             yield return null;
         }
 
+		//fixes any offset issues
+		transform.position.Set (Mathf.RoundToInt (transform.position.z), transform.position.y, Mathf.RoundToInt (transform.position.z));
+
         isMoving = false;
         yield return 0;
     }
