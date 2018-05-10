@@ -141,23 +141,21 @@ public class PlayerController : MonoBehaviour {
             if (input != Vector3.zero)
                 StartCoroutine(move(moveDirection));
             */
-
-            if (x >= 0)
-            {
-                if (z >= 0)
-                    direction = Vector3.right;
-                else if (z <= 0)
-                    direction = -Vector3.forward;
+            if (x != 0 && z != 0) {
+                if (x > 0) {
+                    if (z > 0)
+                        direction = Vector3.right;
+                    else if (z < 0)
+                        direction = -Vector3.forward;
+                } else if (x < 0) {
+                    if (z > 0)
+                        direction = Vector3.forward;
+                    else if (z < 0)
+                        direction = -Vector3.right;
+                }
+                if (input != Vector3.zero)
+                    StartCoroutine(move(direction));
             }
-            else if (x <= 0)
-            {
-                if (z >= 0)
-                    direction = Vector3.forward;
-                else if (z <= 0)
-                    direction = -Vector3.right;
-            }
-            if (input != Vector3.zero)
-                StartCoroutine(move(direction));
         }
 
         Debug.Log(x);
