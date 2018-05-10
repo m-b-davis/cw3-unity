@@ -177,6 +177,7 @@ public class PlayerController : MonoBehaviour {
 
         while (timer < 1f)
         {
+			transform.Rotate (new Vector3(0, -2, 0));
             timer += Time.deltaTime * (moveSpeed / gridSize);
             transform.position = Vector3.Lerp(startPosition, endPosition, timer);
             yield return null;
