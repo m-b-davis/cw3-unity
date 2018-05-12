@@ -81,7 +81,10 @@ public class PlayerController : MonoBehaviour {
 
         //DONE Check if "on grid" and readjust to nearest floor cube's x and z if not
         //TODO Add 4-D rotation using the second joystick and angle checker (might need direction indicator in-game)
-        //TODO MOVEMENT NEEDS DIRECTIONAL OBSTACLE CHECK AS EXTRA CONDITION
+        //DONE MOVEMENT NEEDS DIRECTIONAL OBSTACLE CHECK AS EXTRA CONDITION
+
+        //fixes any rotational issues for raycasting
+        transform.rotation = new Quaternion(0,0,0,0);
 
         if ((Input.GetKeyDown(KeyCode.Space) || (Input.GetKeyDown(KeyCode.Joystick1Button0 /*'A' button*/))) && isGrounded)
         {
