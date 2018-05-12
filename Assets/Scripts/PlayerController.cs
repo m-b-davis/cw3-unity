@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour {
-
-
     public float moveSpeed;
     public float rotateSpeed;
     public float jumpForce;
@@ -21,50 +18,40 @@ public class PlayerController : MonoBehaviour {
     private int movementIterator = 0;
 
     private Vector3 jump, startPosition, endPosition, input;
-    private Rigidbody rigidBody;
 
 	private Vector3 direction;
 
 	// Use this for initialization
-
 	void Start () {
+		this.name = "player";
 		this.Spawn();	
-		this.rigidBody = GetComponent<Rigidbody> ();
-		this.rigidBody.freezeRotation = true;
 		this.jump = new Vector3 (0.0f, this.jumpForce, 0);
 	}
-
-
-
+		
 	void Spawn() {
 		this.gameObject.transform.position = new Vector3 (4, 0.5f, 4);
 	}
-
-	void OnCollisionStay()
-	{
-		isGrounded = true;
-	}
-
-	void HitBlock(Collision collision) {
-		var blockController = collision.gameObject.GetComponent<BlockController> ();
-		var parentController = blockController.parent;
-
-		if (parentController.CanMove (this.direction)) {
-			parentController.Move (this.direction, amount: 1);
-		}
-	}
-
-	void OnCollisionEnter(Collision collision)
-	{
-		if (collision.gameObject.name == "block") {
-			this.HitBlock (collision);
-		}
-		
-		foreach (ContactPoint contact in collision.contacts)
-		{
-			Debug.DrawRay(contact.point, contact.normal, Color.white);
-		}
-	}
+// 
+//	void HitBlock(Collision collision) {
+//		var blockController = collision.gameObject.GetComponent<BlockController> ();
+//		var parentController = blockController.parent;
+//
+//		if (parentController.CanMove (this.direction)) {
+//			parentController.Move (this.direction, amount: 1);
+//		} 
+//	}
+//
+//	void OnCollisionEnter(Collision collision)
+//	{
+//		if (collision.gameObject.name == "block") {
+//			this.HitBlock (collision);
+//		}
+//		
+//		foreach (ContactPoint contact in collision.contacts)
+//		{
+//			Debug.DrawRay(contact.point, contact.normal, Color.white);
+//		}
+//	}
 
 	void GetDirection(float x, float z){ 
 		var absX = Mathf.Abs (x);
@@ -98,19 +85,16 @@ public class PlayerController : MonoBehaviour {
 
         if ((Input.GetKeyDown(KeyCode.Space) || (Input.GetKeyDown(KeyCode.Joystick1Button0 /*'A' button*/))) && isGrounded)
         {
-
-            this.rigidBody.AddForce(jump * jumpForce, ForceMode.Impulse);
-            isGrounded = false;
+            //this.rigidBody.AddForce(jump * jumpForce, ForceMode.Impulse);
+            //sisGrounded = false;
         }
-
-
-
+			
         /* LEFT JOYSTICK (MOVEMENT) */
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        this.GetDirection(x, z);
+        this.GetDirection(x, z);   
         //float xz = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)) * MoveSpeed; //diagonal speed
 
         //float firstVal = 0;
@@ -153,13 +137,21 @@ public class PlayerController : MonoBehaviour {
                     else if (z < 0)
                         direction = -Vector3.right;
                 }
-                if (input != Vector3.zero)
-                    StartCoroutine(move(direction));
+
+				// raycast in target direction
+				// if no hit - move that way
+				// if block, check if block can move
+					// if it can, move that way
+					// else check if we can mantle
+
+
+
+				if (input != Vector3.zero) {
+					TryMove (direction);
+				}
             }
         }
-
-        Debug.Log(x);
-
+			
         /* RIGHT JOYSTICK (ROTATION) */
 
         float x2 = Input.GetAxis("Horizontal2") * Time.deltaTime * rotateSpeed;
@@ -168,8 +160,80 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+	public void TryMove(Vector3 direction) {
+		RaycastHit hit;
+		var transformDirection = transform.TransformDirection (direction);
+		Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * 1000, Color.white);
+
+		int layerMask = 1 << 8;
+
+		if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), transformDirection, out hit, Mathf.Infinity))
+		{
+			
+			Debug.Log ("HIT");			
+			Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * hit.distance, Color.red);
+			if (hit.distance >= 0.8) {
+				// gap 
+				// check if block below
+				RaycastHit hit2;
+
+				if (Physics.Raycast (transform.position, Vector2.down, out hit2, Mathf.Infinity)) {
+					if (hit2.distance <= 0.8) {
+						if (hit2.collider.gameObject.name == "block") {
+							var block = hit2.collider.gameObject.GetComponent<BlockController> ();
+							if (block.SquareEmpty (direction)) {
+								 moveAndDrop (direction);
+								return;
+							}
+						}
+
+					}
+				}
+					
+				// if block below ask block if it can move in that direciton
+				// if so, movedown
+				StartCoroutine (move (direction));
+				return;
+			} else {
+				if (hit.collider.gameObject.name == "block") {
+					var block = hit.collider.gameObject.GetComponent<BlockController> ();
+					if (block.parent.CanMove (direction)) {
+						StartCoroutine (move (direction));
+						block.parent.Move (direction, 1);
+						// can move and will push block
+						return;
+					} else if (block.CanMantle ()) {
+						// can mantle
+						moveAndRise (direction);
+						return;
+					}
+				}
+			}
+		}
+		else
+		{
+			StartCoroutine (move (direction));
+			Debug.DrawRay(transform.position, transformDirection * 1000, Color.white);
+		}
+
+	}
+
+	public void moveAndDrop(Vector3 moveDirection)
+	{
+		Debug.Log ("DROP");
+		StartCoroutine(move(moveDirection + new Vector3 (0, -1, 0)));
+	}
+
+	public void moveAndRise(Vector3 moveDirection)
+	{
+		Debug.Log ("DROP");
+		StartCoroutine(move(moveDirection + new Vector3 (0, 1, 0)));
+	}
+		
     public IEnumerator move(Vector3 moveDirection)
     {
+		Debug.Log ("MOVE");
+
         isMoving = true;
         startPosition = transform.position;
         endPosition = transform.position + moveDirection;
@@ -177,7 +241,7 @@ public class PlayerController : MonoBehaviour {
 
         while (timer < 1f)
         {
-			transform.Rotate (new Vector3(0, -2, 0));
+			//transform.Rotate (new Vector3(0, -2, 0));
             timer += Time.deltaTime * (moveSpeed / gridSize);
             transform.position = Vector3.Lerp(startPosition, endPosition, timer);
             yield return null;
@@ -187,7 +251,6 @@ public class PlayerController : MonoBehaviour {
         yield return 0;
     }
 }
-
 
 /*
 //left joystick angular check

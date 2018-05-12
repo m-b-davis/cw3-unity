@@ -18,7 +18,7 @@ public class LevelGenerator : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		FloorGenerator.GenerateFloor (Width, Length, wallHeight: 10);
 	}
 	
 	// Update is called once per frame
@@ -27,8 +27,6 @@ public class LevelGenerator : MonoBehaviour {
 	}
 		
 	public GameObject[] GenerateLevel() {
-		FloorGenerator.GenerateFloor (Width, Length, wallHeight: 10);
-
 		var row = GenerateRow (this.Width, this.Length, this.NumWalks, this.WalkLength);
 		int yPos = 20;
 		return this.InstantiateRow (row, yPos);

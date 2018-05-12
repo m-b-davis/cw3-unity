@@ -8,6 +8,8 @@ public class FloorGenerator : MonoBehaviour {
 	public GameObject BlackTilePrefab;
 	public GameObject WallPrefab;
 
+	public LayerMask mask = -1;
+
 	// Use this for initialization
 	void Start () {
 		
