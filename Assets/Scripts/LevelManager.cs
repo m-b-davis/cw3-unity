@@ -21,6 +21,7 @@ public class LevelManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
+		this.DropIndex = 0;
 		this.RowCounter = 0;
 		this.LevelGenerator = GetComponentInChildren<LevelGenerator>();
 		this.StartNextRow ();
@@ -36,7 +37,6 @@ public class LevelManager : MonoBehaviour {
 
 	void StartDrop() {
 		this.IsDropping = true;
-		this.DropIndex = 0;
 	}
 
 	// Called by pieces when they have finished falling to check for layer completion

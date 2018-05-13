@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class BlockController : MonoBehaviour {
 
@@ -14,6 +15,7 @@ public class BlockController : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		this.name = "block";
+		this.gameObject.SetActive (false);
 	}
 	
 	// Update is called once per frame
@@ -57,6 +59,14 @@ public class BlockController : MonoBehaviour {
 	public bool CannotMove() {
 		var directions = new Vector3[]{ Vector3.forward, Vector3.back, Vector3.left, Vector3.right };
 		return directions.All (direction => !this.CanMove (direction));
+	}
+
+	public void SetShadowsEnabled(bool enabled) {
+		var shadowMode = enabled ? ShadowCastingMode.On : ShadowCastingMode.Off;
+
+		GetComponentsInChildren<Renderer> ().ToList ().ForEach (renderer => 
+			renderer.shadowCastingMode = shadowMode
+		);
 	}
 
 
