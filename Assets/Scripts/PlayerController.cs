@@ -98,13 +98,6 @@ public class PlayerController : MonoBehaviour {
         float z = Input.GetAxis("Vertical");
 
         this.GetDirection(x, z);   
-        //float xz = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)) * MoveSpeed; //diagonal speed
-
-        //float firstVal = 0;
-        //float secondVal = 0;
-        //float thirdVal = 0;
-
-        //Vector3 direction = new Vector3(0, 0, 0);
 
         input = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -128,16 +121,40 @@ public class PlayerController : MonoBehaviour {
             if (input != Vector3.zero)
                 StartCoroutine(move(moveDirection));
             */
-            if (x != 0 && z != 0) {
-                if (x > 0) {
-                    if (z > 0)
+
+            float newX = x;
+            float newZ = z;
+
+            switch (CameraRotator.rotateDir)
+            {
+                case 0:
+                    newX = x;
+                    newZ = z;
+                    break;
+                case 90:
+                    newX = z;
+                    newZ = -x;
+                    break;
+                case 180:
+                    newX = -x;
+                    newZ = -z;
+                    break;
+                case 270:
+                    newX = -z;
+                    newZ = x;
+                    break;
+            }
+
+            if (newX != 0 && newZ != 0) {
+                if (newX > 0) {
+                    if (newZ > 0)
                         direction = Vector3.right;
-                    else if (z < 0)
+                    else if (newZ < 0)
                         direction = -Vector3.forward;
-                } else if (x < 0) {
-                    if (z > 0)
+                } else if (newX < 0) {
+                    if (newZ > 0)
                         direction = Vector3.forward;
-                    else if (z < 0)
+                    else if (newZ < 0)
                         direction = -Vector3.right;
                 }
 
