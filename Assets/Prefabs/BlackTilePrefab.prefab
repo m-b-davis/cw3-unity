@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 65481649340594238}
   - component: {fileID: 23962835300200558}
   m_Layer: 0
-  m_Name: FloorCubeBlack
+  m_Name: BlackTilePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55,8 +55,9 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 1f3788699af22834190ea0f6b0d25e97, type: 2}
+  - {fileID: 2100000, guid: bb0c9adc9b877914399944d8e49a5ccc, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

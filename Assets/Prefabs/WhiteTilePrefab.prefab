@@ -23,7 +23,7 @@ GameObject:
   - component: {fileID: 65301690920699926}
   - component: {fileID: 23833309853601470}
   m_Layer: 0
-  m_Name: FloorCube
+  m_Name: WhiteTilePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -55,8 +55,9 @@ MeshRenderer:
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
-  - {fileID: 2100000, guid: 34d887a7e60661245beb4f8f9e8684a6, type: 2}
+  - {fileID: 2100000, guid: 8e2e30e5bda24bd4fab67bf935345510, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

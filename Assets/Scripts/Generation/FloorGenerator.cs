@@ -77,16 +77,15 @@ public class FloorGenerator : MonoBehaviour {
 	}
 
 	private void Generate(int width, int height) {
-		int counter = 0;
+
 		var floorParent = new GameObject ("Floor");
 
 		for (int x = 0; x < width; x++) {
 			for (int y = 0; y < height; y++) {
-				bool isWhite = counter % 2 == 0;
+				bool isWhite = (x+y) % 2 == 0;
 				var tilePrefab = isWhite ? WhiteTilePrefab : BlackTilePrefab;
 				var position = new Vector3 (x, 0, y);
 				var tile = Instantiate (tilePrefab, position, Quaternion.identity, floorParent.transform);
-				counter++;
 			}
 		}
 
