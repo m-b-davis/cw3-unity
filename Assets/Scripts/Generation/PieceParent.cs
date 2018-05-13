@@ -9,9 +9,14 @@ public class PieceParent : MonoBehaviour {
 	private BlockController[] blockControllers;
 
 	private bool dropping = false;
-	private int DropSpeed = 10;
+	private int DropSpeed = 7;
 	private bool paused = true;
 	private bool complete = false;
+
+	private bool indicateDrop = false;
+	private float indicatorTimer = 0;
+	private bool indicating = false;
+	private float indicateInterval = 0.5f;
 
 	private LevelManager levelManager;
 
@@ -23,6 +28,7 @@ public class PieceParent : MonoBehaviour {
 
 	public void Begin() {
 		this.paused = false;
+		this.indicateDrop = true;
 	}
 		
 	public int GetRowIndex() {
@@ -59,6 +65,8 @@ public class PieceParent : MonoBehaviour {
 					transform.Translate (0, Time.deltaTime * DropSpeed * -1, 0);
 				} else {
 					this.StopDrop ();
+					this.indicateDrop = false;
+					this.SetShadowsEnabled (true);
 				}
 			} else {
 				if (CanMove (Vector3.down)) {
@@ -68,9 +76,30 @@ public class PieceParent : MonoBehaviour {
 				}
 			}
 		}
+
+		if (indicateDrop) {
+			if (indicatorTimer > 0) {
+				indicatorTimer -= Time.fixedDeltaTime;
+			} else {
+				indicating = !indicating;
+				indicatorTimer = indicateInterval;
+
+				SetShadowsEnabled (indicating);
+			}
+		}
+	}
+
+	private void SetShadowsEnabled(bool isEnabled) {
+		foreach (var controller in blockControllers) {
+			controller.SetShadowsEnabled (isEnabled);
+		}
 	}
 
 	public void StartDrop() {
+		foreach (var controller in blockControllers) {
+			controller.gameObject.SetActive (true);
+		}
+
 		this.dropping = true;
 	}
 

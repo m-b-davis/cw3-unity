@@ -59,18 +59,14 @@ public class PlayerController : MonoBehaviour {
 
 		if (absX > absZ) {
 			if (x > 0) {
-				Debug.Log ("Right");
 				this.direction = Vector3.right;
 			} else {
-				Debug.Log ("Left");
 				this.direction = Vector3.left;
 			}
 		} else if (absZ > absX) {
 			if (z > 0) {
-				Debug.Log ("Forward");
 				this.direction = Vector3.forward;
 			} else {
-				Debug.Log ("Back");
 				this.direction = Vector3.back;
 			}
 		}
@@ -183,33 +179,39 @@ public class PlayerController : MonoBehaviour {
 	public void TryMove(Vector3 direction) {
 		RaycastHit hit;
 		var transformDirection = transform.TransformDirection (direction);
-		Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * 1000, Color.white);
+		Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * 1000, Color.red);
 
 		int layerMask = 1 << 8;
 
 		if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), transformDirection, out hit, Mathf.Infinity))
 		{
 			
-			Debug.Log ("HIT");			
-			Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * hit.distance, Color.red);
+			Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * hit.distance, Color.red, 1);
 			if (hit.distance >= 0.8) {
 				// gap 
 				// check if block below
 				RaycastHit hit2;
 
-				if (Physics.Raycast (transform.position, Vector2.down, out hit2, Mathf.Infinity)) {
-					if (hit2.distance <= 0.8) {
-						if (hit2.collider.gameObject.name == "block") {
-							var block = hit2.collider.gameObject.GetComponent<BlockController> ();
-							if (block.SquareEmpty (direction)) {
-								 moveAndDrop (direction);
-								return;
-							}
-						}
 
+				Debug.DrawRay(transform.position + direction, Vector3.down, Color.red, 2);
+
+				if (Physics.Raycast (transform.position + direction.normalized + new Vector3(0, 0.1f, 0), Vector3.down, out hit2, Mathf.Infinity)) {
+					Debug.DrawRay(transform.position + direction, Vector3.down * hit.distance, Color.green, 2);
+
+					if (hit2.distance > 0.6) {
+//						if (hit2.collider.gameObject.name == "block") {
+//							var block = hit2.collider.gameObject.GetComponent<BlockController> ();
+//							if (block.SquareEmpty (direction)) {
+								moveAndDrop (direction, Mathf.RoundToInt (hit2.distance));
+								return;
+							//}
+						//}
+					} else {
+						StartCoroutine (move (direction));
+						return;
 					}
+
 				}
-					
 				// if block below ask block if it can move in that direciton
 				// if so, movedown
 				StartCoroutine (move (direction));
@@ -238,10 +240,10 @@ public class PlayerController : MonoBehaviour {
 
 	}
 
-	public void moveAndDrop(Vector3 moveDirection)
+	public void moveAndDrop(Vector3 moveDirection, int amount)
 	{
 		Debug.Log ("DROP");
-		StartCoroutine(move(moveDirection + new Vector3 (0, -1, 0)));
+		StartCoroutine(move(moveDirection + new Vector3 (0, -amount, 0)));
 	}
 
 	public void moveAndRise(Vector3 moveDirection)
@@ -252,9 +254,9 @@ public class PlayerController : MonoBehaviour {
 		
     public IEnumerator move(Vector3 moveDirection)
     {
+		this.isMoving = true;
 		Debug.Log ("MOVE");
 
-        isMoving = true;
         startPosition = transform.position;
         endPosition = transform.position + moveDirection;
         timer = 0;
