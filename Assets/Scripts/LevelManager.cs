@@ -17,12 +17,16 @@ public class LevelManager : MonoBehaviour {
 	private float TimeUntilDrop;
 	private int DropIndex;
 
+	private BlurController BlurController;
+
 	private List<PieceParent> Pieces = new List<PieceParent>();
 
 	// Use this for initialization
 	void Start () {
 		this.DropIndex = 0;
 		this.RowCounter = 0;
+		this.BlurController = FindObjectOfType<BlurController> ();
+		this.BlurController.HideBlur ();
 		this.LevelGenerator = GetComponentInChildren<LevelGenerator>();
 		this.StartNextRow ();
 	}
@@ -83,5 +87,9 @@ public class LevelManager : MonoBehaviour {
 				TimeUntilDrop -= Time.deltaTime;
 			}
 		}
+	}
+
+	public void PlayerDied() {
+		BlurController.HideBlur ();
 	}
 }

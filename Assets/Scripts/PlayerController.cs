@@ -21,8 +21,11 @@ public class PlayerController : MonoBehaviour {
 
 	private Vector3 direction;
 
+	private LevelManager LevelManager;
+
 	// Use this for initialization
 	void Start () {
+		this.LevelManager = FindObjectOfType<LevelManager> ();
 		this.name = "player";
 		this.Spawn();	
 		this.jump = new Vector3 (0.0f, this.jumpForce, 0);
@@ -181,8 +184,6 @@ public class PlayerController : MonoBehaviour {
 		var transformDirection = transform.TransformDirection (direction);
 		Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * 1000, Color.red);
 
-		int layerMask = 1 << 8;
-
 		if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), transformDirection, out hit, Mathf.Infinity))
 		{
 			
@@ -273,8 +274,35 @@ public class PlayerController : MonoBehaviour {
 		transform.position.Set (Mathf.RoundToInt (transform.position.z), transform.position.y, Mathf.RoundToInt (transform.position.z));
 
         isMoving = false;
+		this.CheckForFailure ();
         yield return 0;
     }
+
+	private void CheckForFailure() {
+
+		var directions = new Vector3[]{ Vector3.left, Vector3.right, Vector3.forward, Vector3.back };
+		var heights = new float[] { 0.5f, 1.5f };
+
+
+		foreach (var direction in directions) {
+			foreach (var height in heights) {
+				RaycastHit hit;
+				if (Physics.Raycast (transform.position + new Vector3 (0, height, 0), direction, out hit, Mathf.Infinity)) {
+					if (hit.distance > 0.8) {
+						// Can move
+						return;
+					}
+				}
+			}
+		}
+
+		// If we get here, player has no possible moves
+		this.PlayerDied();
+	}
+
+	private void PlayerDied() {
+		this.LevelManager.PlayerDied ();
+	}
 }
 
 /*
