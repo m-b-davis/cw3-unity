@@ -17,6 +17,8 @@ public class LevelManager : MonoBehaviour {
 	private float TimeUntilDrop;
 	private int DropIndex;
 
+	private int difficulty = 0;
+
 	private BlurController BlurController;
 
 	private List<PieceParent> Pieces = new List<PieceParent>();
@@ -91,5 +93,34 @@ public class LevelManager : MonoBehaviour {
 
 	public void PlayerDied() {
 		BlurController.HideBlur ();
+	}
+}
+
+
+
+public static class DifficultyManager {
+
+	public enum DifficultyVariable {
+		MaxWalkLength,
+		SingleBlockProbability,
+		DropSpeed,
+		DropRate
+	}
+
+	const Dictionary<DifficultyVariable, int[]> DifficultyRanges = new Dictionary<DifficultyVariable, float[]> {
+		{ DifficultyVariable.MaxWalkLength, new float[] { 1f, 7f } },
+		{ DifficultyVariable.SingleBlockProbability, new float[] { 0.7f, 0.2f } },
+		{ DifficultyVariable.DropSpeed, new float[] { 4f, 15f } },
+		{ DifficultyVariable.DropRate, new float[] { 5f, 1f } }
+	};
+
+	public static int MinDifficulty = 1;
+	public static int MaxDifficulty = 15;
+
+
+	public float GetVariable(DifficultyVariable name, float difficulty) {
+		var range = DifficultyRanges [name];
+		var percentage = difficulty / MaxDifficulty;
+		return Mathf.Lerp (range [0], range [1], percentage);
 	}
 }
