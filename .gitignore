@@ -37,3 +37,7 @@ sysinfo.txt
 Assets/Materials/Blur.mat
 Assets/Materials/BlurShader.shader
 *.shader
+*.shader
+*.mat
+*.json
+UnityPackageManager/manifest.json
