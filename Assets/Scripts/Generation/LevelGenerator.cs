@@ -18,7 +18,7 @@ public class LevelGenerator : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		
+		FloorGenerator.GenerateFloor (Width, Length, wallHeight: 10);
 	}
 	
 	// Update is called once per frame
@@ -27,8 +27,6 @@ public class LevelGenerator : MonoBehaviour {
 	}
 		
 	public GameObject[] GenerateLevel() {
-		FloorGenerator.GenerateFloor (Width, Length, wallHeight: 10);
-
 		var row = GenerateRow (this.Width, this.Length, this.NumWalks, this.WalkLength);
 		int yPos = 20;
 		return this.InstantiateRow (row, yPos);
@@ -104,6 +102,9 @@ public class LevelGenerator : MonoBehaviour {
 	int GetWalkLength() {
 		float random = Random.Range (0f, 1f);
 
+		if (random < 0.5)
+			return 1;
+
 		if (random > 0.8) 
 			return Random.Range (3, 6);
 	
@@ -112,9 +113,6 @@ public class LevelGenerator : MonoBehaviour {
 
 	Walk[] GenerateRow(int width, int length, int numWalks, int maxWalkLength) {
 		int[,] row = new int[width, length];
-
-
-
 
 		var walks = new Walk[numWalks];
 
@@ -127,7 +125,6 @@ public class LevelGenerator : MonoBehaviour {
 
 			int walkLength = GetWalkLength ();
 			Walk walk = new Walk (currentPosition, walkSymbol);
-			Debug.Log (walkLength);
 			for (int w = 1; w < walkLength; w++) {
 				int[][] validMoves = this.GetValidMoves (row, currentPosition[0], currentPosition[1], blankSymbol);
 

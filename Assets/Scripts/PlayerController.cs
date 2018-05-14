@@ -3,10 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour {
-
-
     public float moveSpeed;
     public float rotateSpeed;
     public float jumpForce;
@@ -21,50 +18,40 @@ public class PlayerController : MonoBehaviour {
     private int movementIterator = 0;
 
     private Vector3 jump, startPosition, endPosition, input;
-    private Rigidbody rigidBody;
 
 	private Vector3 direction;
 
 	// Use this for initialization
-
 	void Start () {
+		this.name = "player";
 		this.Spawn();	
-		this.rigidBody = GetComponent<Rigidbody> ();
-		this.rigidBody.freezeRotation = true;
 		this.jump = new Vector3 (0.0f, this.jumpForce, 0);
 	}
-
-
-
+		
 	void Spawn() {
 		this.gameObject.transform.position = new Vector3 (4, 0.5f, 4);
 	}
-
-	void OnCollisionStay()
-	{
-		isGrounded = true;
-	}
-
-	void HitBlock(Collision collision) {
-		var blockController = collision.gameObject.GetComponent<BlockController> ();
-		var parentController = blockController.parent;
-
-		if (parentController.CanMove (this.direction)) {
-			parentController.Move (this.direction, amount: 1);
-		}
-	}
-
-	void OnCollisionEnter(Collision collision)
-	{
-		if (collision.gameObject.name == "block") {
-			this.HitBlock (collision);
-		}
-		
-		foreach (ContactPoint contact in collision.contacts)
-		{
-			Debug.DrawRay(contact.point, contact.normal, Color.white);
-		}
-	}
+// 
+//	void HitBlock(Collision collision) {
+//		var blockController = collision.gameObject.GetComponent<BlockController> ();
+//		var parentController = blockController.parent;
+//
+//		if (parentController.CanMove (this.direction)) {
+//			parentController.Move (this.direction, amount: 1);
+//		} 
+//	}
+//
+//	void OnCollisionEnter(Collision collision)
+//	{
+//		if (collision.gameObject.name == "block") {
+//			this.HitBlock (collision);
+//		}
+//		
+//		foreach (ContactPoint contact in collision.contacts)
+//		{
+//			Debug.DrawRay(contact.point, contact.normal, Color.white);
+//		}
+//	}
 
 	void GetDirection(float x, float z){ 
 		var absX = Mathf.Abs (x);
@@ -72,18 +59,14 @@ public class PlayerController : MonoBehaviour {
 
 		if (absX > absZ) {
 			if (x > 0) {
-				Debug.Log ("Right");
 				this.direction = Vector3.right;
 			} else {
-				Debug.Log ("Left");
 				this.direction = Vector3.left;
 			}
 		} else if (absZ > absX) {
 			if (z > 0) {
-				Debug.Log ("Forward");
 				this.direction = Vector3.forward;
 			} else {
-				Debug.Log ("Back");
 				this.direction = Vector3.back;
 			}
 		}
@@ -94,30 +77,23 @@ public class PlayerController : MonoBehaviour {
 
         //DONE Check if "on grid" and readjust to nearest floor cube's x and z if not
         //TODO Add 4-D rotation using the second joystick and angle checker (might need direction indicator in-game)
-        //TODO MOVEMENT NEEDS DIRECTIONAL OBSTACLE CHECK AS EXTRA CONDITION
+        //DONE MOVEMENT NEEDS DIRECTIONAL OBSTACLE CHECK AS EXTRA CONDITION
+
+        //fixes any rotational issues for raycasting
+        transform.rotation = new Quaternion(0,0,0,0);
 
         if ((Input.GetKeyDown(KeyCode.Space) || (Input.GetKeyDown(KeyCode.Joystick1Button0 /*'A' button*/))) && isGrounded)
         {
-
-            this.rigidBody.AddForce(jump * jumpForce, ForceMode.Impulse);
-            isGrounded = false;
+            //this.rigidBody.AddForce(jump * jumpForce, ForceMode.Impulse);
+            //sisGrounded = false;
         }
-
-
-
+			
         /* LEFT JOYSTICK (MOVEMENT) */
 
         float x = Input.GetAxis("Horizontal");
         float z = Input.GetAxis("Vertical");
 
-        this.GetDirection(x, z);
-        //float xz = Mathf.Sqrt(Mathf.Pow(x, 2) + Mathf.Pow(z, 2)) * MoveSpeed; //diagonal speed
-
-        //float firstVal = 0;
-        //float secondVal = 0;
-        //float thirdVal = 0;
-
-        //Vector3 direction = new Vector3(0, 0, 0);
+        this.GetDirection(x, z);   
 
         input = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -141,25 +117,57 @@ public class PlayerController : MonoBehaviour {
             if (input != Vector3.zero)
                 StartCoroutine(move(moveDirection));
             */
-            if (x != 0 && z != 0) {
-                if (x > 0) {
-                    if (z > 0)
+
+            float newX = x;
+            float newZ = z;
+
+            switch (CameraRotator.rotateDir)
+            {
+                case 0:
+                    newX = x;
+                    newZ = z;
+                    break;
+                case 90:
+                    newX = z;
+                    newZ = -x;
+                    break;
+                case 180:
+                    newX = -x;
+                    newZ = -z;
+                    break;
+                case 270:
+                    newX = -z;
+                    newZ = x;
+                    break;
+            }
+
+            if (newX != 0 && newZ != 0) {
+                if (newX > 0) {
+                    if (newZ > 0)
                         direction = Vector3.right;
-                    else if (z < 0)
+                    else if (newZ < 0)
                         direction = -Vector3.forward;
-                } else if (x < 0) {
-                    if (z > 0)
+                } else if (newX < 0) {
+                    if (newZ > 0)
                         direction = Vector3.forward;
-                    else if (z < 0)
+                    else if (newZ < 0)
                         direction = -Vector3.right;
                 }
-                if (input != Vector3.zero)
-                    StartCoroutine(move(direction));
+
+				// raycast in target direction
+				// if no hit - move that way
+				// if block, check if block can move
+					// if it can, move that way
+					// else check if we can mantle
+
+
+
+				if (input != Vector3.zero) {
+					TryMove (direction);
+				}
             }
         }
-
-        Debug.Log(x);
-
+			
         /* RIGHT JOYSTICK (ROTATION) */
 
         float x2 = Input.GetAxis("Horizontal2") * Time.deltaTime * rotateSpeed;
@@ -168,16 +176,94 @@ public class PlayerController : MonoBehaviour {
 
     }
 
+	public void TryMove(Vector3 direction) {
+		RaycastHit hit;
+		var transformDirection = transform.TransformDirection (direction);
+		Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * 1000, Color.red);
+
+		int layerMask = 1 << 8;
+
+		if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), transformDirection, out hit, Mathf.Infinity))
+		{
+			
+			Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * hit.distance, Color.red, 1);
+			if (hit.distance >= 0.8) {
+				// gap 
+				// check if block below
+				RaycastHit hit2;
+
+
+				Debug.DrawRay(transform.position + direction, Vector3.down, Color.red, 2);
+
+				if (Physics.Raycast (transform.position + direction.normalized + new Vector3(0, 0.1f, 0), Vector3.down, out hit2, Mathf.Infinity)) {
+					Debug.DrawRay(transform.position + direction, Vector3.down * hit.distance, Color.green, 2);
+
+					if (hit2.distance > 0.6) {
+//						if (hit2.collider.gameObject.name == "block") {
+//							var block = hit2.collider.gameObject.GetComponent<BlockController> ();
+//							if (block.SquareEmpty (direction)) {
+								moveAndDrop (direction, Mathf.RoundToInt (hit2.distance));
+								return;
+							//}
+						//}
+					} else {
+						StartCoroutine (move (direction));
+						return;
+					}
+
+				}
+				// if block below ask block if it can move in that direciton
+				// if so, movedown
+				StartCoroutine (move (direction));
+				return;
+			} else {
+				if (hit.collider.gameObject.name == "block") {
+					var block = hit.collider.gameObject.GetComponent<BlockController> ();
+					if (block.parent.CanMove (direction)) {
+						StartCoroutine (move (direction));
+						block.parent.Move (direction, 1);
+						// can move and will push block
+						return;
+					} else if (block.CanMantle ()) {
+						// can mantle
+						moveAndRise (direction);
+						return;
+					}
+				}
+			}
+		}
+		else
+		{
+			StartCoroutine (move (direction));
+			Debug.DrawRay(transform.position, transformDirection * 1000, Color.white);
+		}
+
+	}
+
+	public void moveAndDrop(Vector3 moveDirection, int amount)
+	{
+		Debug.Log ("DROP");
+		StartCoroutine(move(moveDirection + new Vector3 (0, -amount, 0)));
+	}
+
+	public void moveAndRise(Vector3 moveDirection)
+	{
+		Debug.Log ("DROP");
+		StartCoroutine(move(moveDirection + new Vector3 (0, 1, 0)));
+	}
+		
     public IEnumerator move(Vector3 moveDirection)
     {
-        isMoving = true;
+		this.isMoving = true;
+		Debug.Log ("MOVE");
+
         startPosition = transform.position;
         endPosition = transform.position + moveDirection;
         timer = 0;
 
         while (timer < 1f)
         {
-			transform.Rotate (new Vector3(0, -2, 0));
+			//transform.Rotate (new Vector3(0, -2, 0));
             timer += Time.deltaTime * (moveSpeed / gridSize);
             transform.position = Vector3.Lerp(startPosition, endPosition, timer);
             yield return null;
@@ -190,7 +276,6 @@ public class PlayerController : MonoBehaviour {
         yield return 0;
     }
 }
-
 
 /*
 //left joystick angular check
