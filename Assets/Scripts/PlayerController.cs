@@ -173,8 +173,8 @@ public class PlayerController : MonoBehaviour {
 			
         /* RIGHT JOYSTICK (ROTATION) */
 
-        float x2 = Input.GetAxis("Horizontal2") * Time.deltaTime * rotateSpeed;
-        float z2 = Input.GetAxis("Vertical2") * Time.deltaTime * rotateSpeed;
+        //float x2 = Input.GetAxis("Horizontal2") * Time.deltaTime * rotateSpeed;
+        //float z2 = Input.GetAxis("Vertical2") * Time.deltaTime * rotateSpeed;
         //transform.Rotate(0, z2, 0);
 
     }

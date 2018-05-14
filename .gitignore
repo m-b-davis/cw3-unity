@@ -34,3 +34,5 @@ sysinfo.txt
 # Builds
 *.apk
 *.unitypackage
+Assets/Materials/Blur.mat
+Assets/Materials/BlurShader.shader
