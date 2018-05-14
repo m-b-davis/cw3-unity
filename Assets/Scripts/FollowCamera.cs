@@ -23,6 +23,7 @@ public class FollowCamera: MonoBehaviour
 	}
 
 	void FixedUpdate() {
+		
 		if (firstFrame) {
 			transform.position = spawnOffset;
 			firstFrame = false;
