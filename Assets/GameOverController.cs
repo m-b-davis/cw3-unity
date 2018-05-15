@@ -39,7 +39,7 @@ public class GameOverController : MonoBehaviour {
 		RestartDelay = 2;
 		SetTextVisible (true);
 		ScoreText.text = string.Format ("SCORE: {0}", score);
-		CauseOfDeathText.text = "CAUSE OF DEATH: " + CauseStrings [cause];
+		CauseOfDeathText.text = "CAUSE OF DEATH:\n" + CauseStrings [cause];
 	}
 
 

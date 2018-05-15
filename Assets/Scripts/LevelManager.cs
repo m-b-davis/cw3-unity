@@ -233,8 +233,8 @@ public enum DifficultyVariable {
 
 public static class DifficultyManager {
 	public static Dictionary<DifficultyVariable, float[]> DifficultyRanges = new Dictionary<DifficultyVariable, float[]> {
-		{ DifficultyVariable.MaxWalkLength, new float[] { 1f, 7f } },
-		{ DifficultyVariable.SingleBlockProbability, new float[] { 0.7f, 0.2f } },
+		{ DifficultyVariable.MaxWalkLength, new float[] { 2f, 7f } },
+		{ DifficultyVariable.SingleBlockProbability, new float[] { 0.6f, 0.2f } },
 		{ DifficultyVariable.DropSpeed, new float[] { 4f, 10f } },
 		{ DifficultyVariable.DropDelay, new float[] { 5f, 1f } },
 		{ DifficultyVariable.RowCompleteThreshold, new float[] { 0.45f, 0.8f } },

@@ -7,10 +7,11 @@ public class CameraRotator : MonoBehaviour {
     public static int rotateDir = 0;
     public GameObject player;
     private bool rotating = false;
+	public float smoothTime = 0.125f;
 
 	void Update () {
 
-        transform.position = player.transform.position;
+		transform.position = Vector3.Lerp (transform.position, player.transform.position, smoothTime);
 
         /*if (Input.GetAxisRaw("Left Trigger") != 0)
         {
