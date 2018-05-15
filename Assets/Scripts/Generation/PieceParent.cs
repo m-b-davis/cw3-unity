@@ -120,8 +120,8 @@ public class PieceParent : MonoBehaviour {
 
 	public void StopDrop() {
 		this.dropping = false;
-		this.levelManager.HandlePieceFell (this);
 		this.CanCrush = false;
+		this.levelManager.HandlePieceFell (this);
 	}
 
 	public bool CanMove(Vector3 direction) {
