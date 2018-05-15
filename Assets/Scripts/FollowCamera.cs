@@ -44,5 +44,6 @@ public class FollowCamera: MonoBehaviour
 
 		transform.position = new Vector3 (transform.position.x, smoothedPosition.y, transform.position.z);
 	}
+
 }
 

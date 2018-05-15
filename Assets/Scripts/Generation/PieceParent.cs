@@ -9,7 +9,7 @@ public class PieceParent : MonoBehaviour {
 	private BlockController[] blockControllers;
 
 	private bool dropping = false;
-	private int DropSpeed = 7;
+	private float DropSpeed = 0;
 	private bool paused = true;
 	private bool complete = false;
 
@@ -17,6 +17,10 @@ public class PieceParent : MonoBehaviour {
 	private float indicatorTimer = 0;
 	private bool indicating = false;
 	private float indicateInterval = 0.5f;
+
+	public bool CanCrush = true;
+
+	public int NumBlocks { get { return blockControllers.Length; } }
 
 	private LevelManager levelManager;
 
@@ -26,7 +30,8 @@ public class PieceParent : MonoBehaviour {
 		this.InitialiseChildren ();
 	}
 
-	public void Begin() {
+	public void Begin(float dropSpeed) {
+		this.DropSpeed = dropSpeed;
 		this.paused = false;
 		this.indicateDrop = true;
 	}
@@ -106,6 +111,7 @@ public class PieceParent : MonoBehaviour {
 	public void StopDrop() {
 		this.dropping = false;
 		this.levelManager.HandlePieceFell (this);
+		this.CanCrush = false;
 	}
 
 	public bool CanMove(Vector3 direction) {
@@ -129,7 +135,6 @@ public class PieceParent : MonoBehaviour {
 	}
 		
 	public void Move(Vector3 direction, float amount) {
-
 		transform.Translate (direction * amount);
 	}
 }
