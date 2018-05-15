@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour {
 
@@ -100,6 +101,28 @@ public class LevelManager : MonoBehaviour {
 
 	}
 
+	void OnEnable()
+	{
+		//Tell our 'OnLevelFinishedLoading' function to start listening for a scene change as soon as this script is enabled.
+		SceneManager.sceneLoaded += OnLevelWasLoaded;
+	}
+
+	void OnDisable()
+	{
+		//Tell our 'OnLevelFinishedLoading' function to stop listening for a scene change as soon as this script is disabled.
+		//Remember to always have an unsubscription for every delegate you
+		SceneManager.sceneLoaded -= OnLevelWasLoaded;
+	}
+
+
+	void OnLevelWasLoaded(Scene scene, LoadSceneMode mode) {
+		if (UnityEditor.Lightmapping.giWorkflowMode == UnityEditor.Lightmapping.GIWorkflowMode.Iterative) {
+			DynamicGI.UpdateEnvironment();
+		}
+	}
+
+
+
 	// Called by pieces when they have finished falling to check for layer completion
 	public void HandlePieceFell(PieceParent piece) {
 		
@@ -177,10 +200,15 @@ public class LevelManager : MonoBehaviour {
 		this.IncreaseDifficulty ((Time.deltaTime / 20) * difficultyIncreaseRate);
 	}
 
+	private bool dead = false;
+
 	public void PlayerDied(CauseOfDeath cause) {
 		this.freezeInput = true;
-		BlurController.ShowBlur ();
-		FindObjectOfType<GameOverController> ().Show (score, cause);
+		if (!dead) {
+			dead = true;
+			BlurController.ShowBlur ();
+			FindObjectOfType<GameOverController> ().Show (score, cause);
+		}
 	}
 
 	public void PlayerCrushed() {
@@ -209,7 +237,7 @@ public static class DifficultyManager {
 		{ DifficultyVariable.SingleBlockProbability, new float[] { 0.7f, 0.2f } },
 		{ DifficultyVariable.DropSpeed, new float[] { 4f, 10f } },
 		{ DifficultyVariable.DropDelay, new float[] { 5f, 1f } },
-		{ DifficultyVariable.RowCompleteThreshold, new float[] { 0.4f, 0.8f } },
+		{ DifficultyVariable.RowCompleteThreshold, new float[] { 0.45f, 0.8f } },
 		{ DifficultyVariable.MaxHeight, new float[] { 4, 8 }}
 	};
 

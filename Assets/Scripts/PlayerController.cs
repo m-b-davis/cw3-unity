@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour {
 
     private int movementIterator = 0;
 
+    public AudioSource audio;
+
     private Vector3 jump, startPosition, endPosition, input;
 
 	private Vector3 direction;
@@ -198,10 +200,12 @@ public class PlayerController : MonoBehaviour {
 				if (hitFloor.collider.gameObject.name == "block") {
 					var block = hitFloor.collider.gameObject.GetComponent<BlockController> ();
 					if (block.parent.CanMove (direction)) {
-						StartCoroutine (move (direction));
+                        audio.Play();
+                        StartCoroutine (move (direction));
 						block.parent.Move (direction, 1);
-						// can move and will push block
-						return;
+                        
+                        // can move and will push block
+                        return;
 					} else if (block.CanMantle ()) {
 						// can mantle
 						moveAndRise (direction);
@@ -217,6 +221,18 @@ public class PlayerController : MonoBehaviour {
 		}
 
 	}
+
+
+	void OnPauseGame ()
+	{
+		FreezeInput = true;
+	}
+
+	void OnResumeGame ()
+	{
+		FreezeInput = false;
+	}
+
 
 	public void moveAndDrop(Vector3 moveDirection, int amount)
 	{

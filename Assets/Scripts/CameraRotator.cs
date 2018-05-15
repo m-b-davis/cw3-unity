@@ -26,13 +26,13 @@ public class CameraRotator : MonoBehaviour {
         {
 
             //sets rotation when rotation key is pressed
-            if ((Input.GetKey(KeyCode.Q) || (Input.GetAxis("Left Trigger")) != 0) && !(Input.GetKey(KeyCode.E) || (Input.GetAxis("Right Trigger")) != 0))
+            if ((Input.GetKey(KeyCode.Q) || (Input.GetAxis("Left Trigger")) == 1) && !(Input.GetKey(KeyCode.E) || (Input.GetAxis("Right Trigger")) == 1))
             {
                 rotating = true;
                 rotateDir += 90;
                 StartCoroutine("RotatorTimer");
             }
-            else if ((Input.GetKey(KeyCode.E) || (Input.GetAxis("Right Trigger")) != 0) && !(Input.GetKey(KeyCode.Q) || (Input.GetAxis("Left Trigger")) != 0)) {
+            else if ((Input.GetKey(KeyCode.E) || (Input.GetAxis("Right Trigger")) == 1) && !(Input.GetKey(KeyCode.Q) || (Input.GetAxis("Left Trigger")) == 1)) {
                 rotating = true;
                 rotateDir -= 90;
                 StartCoroutine("RotatorTimer");
@@ -45,7 +45,7 @@ public class CameraRotator : MonoBehaviour {
                 rotateDir = 270;
         }
 
-        transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(0, rotateDir, 0), 5 * Time.deltaTime);
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(1, rotateDir, 1), 5 * Time.deltaTime);
 
     }
 

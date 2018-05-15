@@ -18,6 +18,16 @@ public class PieceParent : MonoBehaviour {
 	private bool indicating = false;
 	private float indicateInterval = 0.5f;
 
+	void OnPauseGame ()
+	{
+		paused = true;
+	}
+
+	void OnResumeGame ()
+	{
+		paused = false;
+	}
+
 	public bool CanCrush = true;
 
 	public int NumBlocks { get { return blockControllers.Length; } }

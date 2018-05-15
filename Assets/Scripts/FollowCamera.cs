@@ -18,32 +18,31 @@ public class FollowCamera: MonoBehaviour
 	}
 
 	void Start() {
-
-
-	}
+        transform.position = spawnOffset;
+    }
 
 	void FixedUpdate() {
-		
-		if (firstFrame) {
-			transform.position = spawnOffset;
-			firstFrame = false;
+
+        /*if (firstFrame) {
+            transform.position = spawnOffset;
+            firstFrame = false;
 			return;
-		}
+		}*/
+        if (!Menu.gameStart) {
+            var desiredPosition = target.position + offset;
 
-		var desiredPosition = target.position + offset;
+            if (SpawnZoom) {
+                desiredPosition = desiredPosition + (spawnOffset * ZoomTimeRemaining);
+                ZoomTimeRemaining -= Time.deltaTime;
 
-		if (SpawnZoom) {
-			desiredPosition = desiredPosition + (spawnOffset * ZoomTimeRemaining);
-			ZoomTimeRemaining -= Time.deltaTime;
+                if (ZoomTimeRemaining <= 0)
+                    SpawnZoom = false;
+            }
 
-			if (ZoomTimeRemaining <= 0)
-				SpawnZoom = false;
-		}
+            var smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
 
-		var smoothedPosition = Vector3.Lerp (transform.position, desiredPosition, smoothSpeed);
-
-		transform.position = new Vector3 (transform.position.x, smoothedPosition.y, transform.position.z);
-	}
-
+            transform.position = new Vector3(transform.position.x, smoothedPosition.y, transform.position.z);
+        }
+    }
 }
 

@@ -15,6 +15,8 @@ public class BlurController : MonoBehaviour {
 	private RawImage rend;
 
 	public void ShowBlur(float time = 3f) {
+		Debug.Log ("Show blur for secs:" + time.ToString());
+
 		blurTarget = BlurAmount;
 		blurStart = 0;
 		blurTimer = time;
@@ -22,6 +24,7 @@ public class BlurController : MonoBehaviour {
 	}
 
 	public void HideBlur(float time = 3f) {
+		Debug.Log ("Hide blur");
 		blurTarget = 0;
 		blurStart = BlurAmount;
 		blurTimer = time;
@@ -35,10 +38,13 @@ public class BlurController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		Debug.Log (blurTimer);
+
 		if (blurTimer > 0f) {
 			blurTimer -= Time.deltaTime;
 			currentBlur = Mathf.Lerp (blurStart, blurTarget, blurTime - blurTimer);
 
+			Debug.Log (currentBlur);
 			rend.material.SetFloat ("_Size", currentBlur);
 		}
 	}
