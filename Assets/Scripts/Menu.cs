@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class Menu : MonoBehaviour {
 
-    public GameObject GUICanvas, MenuCanvas, camera, gameObjects;
+    public GameObject GUICanvas, MenuCanvas, StartCanvas, camera, gameComponents;
 
+    public static bool gameStart = true;
     private bool menuActive = false;
 
     private BlurController blurController;
@@ -17,23 +18,42 @@ public class Menu : MonoBehaviour {
 	
 
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.Escape))
+
+        if (!gameStart)
         {
-            menuActive = !menuActive;
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                menuActive = !menuActive;
+            }
+
+            GUICanvas.SetActive(!menuActive);
+            //gameObjects.SetActive(!menuActive);
+            MenuCanvas.SetActive(menuActive);
+
+            if (menuActive)
+                blurController.ShowBlur();
+            else
+                blurController.HideBlur();
+
+            /*if (menuActive)
+                camera.GetComponent<Camera>().cullingMask = 0;
+            else
+                camera.GetComponent<Camera>().cullingMask = 1;*/
         }
-
-        GUICanvas.SetActive(!menuActive);
-        //gameObjects.SetActive(!menuActive);
-        MenuCanvas.SetActive(menuActive);
-
-        if (menuActive)
-            blurController.ShowBlur();
         else
-            blurController.HideBlur();
+        {
+            gameComponents.SetActive(false);
+            GUICanvas.SetActive(false);
+            MenuCanvas.SetActive(false);
+            StartCanvas.SetActive(true);
 
-        /*if (menuActive)
-            camera.GetComponent<Camera>().cullingMask = 0;
-        else
-            camera.GetComponent<Camera>().cullingMask = 1;*/
+            if (Input.anyKeyDown)
+            {
+                gameStart = false;
+                StartCanvas.SetActive(false);
+                GUICanvas.SetActive(true);
+                gameComponents.SetActive(true);
+            }
+        }
     }
 }
