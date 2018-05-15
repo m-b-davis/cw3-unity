@@ -12,7 +12,9 @@ public class LevelManager : MonoBehaviour {
 
 	private LevelGenerator LevelGenerator;
 
-	public float DropDelay;
+    public AudioSource gameOverAudio;
+
+    public float DropDelay;
 	public float DropDelayVariance;
 
 	public int NumRows;
@@ -159,11 +161,11 @@ public class LevelManager : MonoBehaviour {
 		if (currentHeight > maxHeight) {
 			this.PlayerDied (CauseOfDeath.BlockHeightReached);
 		} else if (currentHeight == maxHeight) {
-			HeightIndicator.color = Color.red;
-		} else if (currentHeight == maxHeight) {
-			HeightIndicator.color = Color.yellow;
-		} else {
-			HeightIndicator.color = Color.green;
+			HeightIndicator.color = new Color(0.8f, 0.0f, 0.0f);
+        } else if (currentHeight == maxHeight - 1) {
+			HeightIndicator.color = new Color(0.4f, 0.4f, 0.0f);
+        } else {
+			HeightIndicator.color = new Color(0.0f, 0.8f, 0.0f);
 		}
 
 		this.HeightIndicator.text = string.Format ("HEIGHT: {0}  MAX: {1}", currentHeight, Mathf.FloorToInt(maxHeight)); 
@@ -203,7 +205,8 @@ public class LevelManager : MonoBehaviour {
 	private bool dead = false;
 
 	public void PlayerDied(CauseOfDeath cause) {
-		this.freezeInput = true;
+        gameOverAudio.Play();
+        this.freezeInput = true;
 		if (!dead) {
 			dead = true;
 			BlurController.ShowBlur ();
