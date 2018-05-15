@@ -47,6 +47,7 @@ public class TutoController : MonoBehaviour
 
     void Update() {
 
+        gameObject.transform.localEulerAngles = new Vector3(0,0,-Mathf.Sin(Time.time)/2);
 
         if (Input.GetAxis("Horizontal") != 0 && Input.GetAxis("Vertical") != 0) {
             LS = true;
