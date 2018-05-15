@@ -103,27 +103,6 @@ public class LevelManager : MonoBehaviour {
 
 	}
 
-	void OnEnable()
-	{
-		//Tell our 'OnLevelFinishedLoading' function to start listening for a scene change as soon as this script is enabled.
-		SceneManager.sceneLoaded += OnLevelWasLoaded;
-	}
-
-	void OnDisable()
-	{
-		//Tell our 'OnLevelFinishedLoading' function to stop listening for a scene change as soon as this script is disabled.
-		//Remember to always have an unsubscription for every delegate you
-		SceneManager.sceneLoaded -= OnLevelWasLoaded;
-	}
-
-
-	void OnLevelWasLoaded(Scene scene, LoadSceneMode mode) {
-		if (UnityEditor.Lightmapping.giWorkflowMode == UnityEditor.Lightmapping.GIWorkflowMode.Iterative) {
-			DynamicGI.UpdateEnvironment();
-		}
-	}
-
-
 
 	// Called by pieces when they have finished falling to check for layer completion
 	public void HandlePieceFell(PieceParent piece) {
