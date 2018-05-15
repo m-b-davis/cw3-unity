@@ -62,18 +62,19 @@ public class TutoController : MonoBehaviour
                 leftStick.transform.localPosition = Vector3.zero;
             }
 
-            if (!RT)
-                animateTrigger(rightTrigger.transform);
-            else
+            if (!(RT && LS))
+            {
+                animateTriggers(rightTrigger.transform, leftTrigger.transform);
+            }
+
+            if (RT)
             {
                 rightTrigger.transform.position = new Vector3(rightTrigger.transform.position.x, triggerPosY, rightTrigger.transform.position.z);
                 Color color = rightTrigger.GetComponent<Image>().color;
                 rightTrigger.GetComponent<Image>().color = new Color(color.r - 0.01f, color.g - 0.01f, color.b - 0.01f);
             }
 
-            if (!LT)
-                animateTrigger(leftTrigger.transform);
-            else
+            if (LT)
             {
                 leftTrigger.transform.position = new Vector3(leftTrigger.transform.position.x, triggerPosY, leftTrigger.transform.position.z);
                 Color color = leftTrigger.GetComponent<Image>().color;
@@ -92,19 +93,28 @@ public class TutoController : MonoBehaviour
             
     }
 
-    void animateTrigger(Transform tr) {
-        float x = tr.position.x;
-        float z = tr.position.z;
+    void animateTriggers(Transform rightTrigger, Transform leftTrigger) {
 
-        if (tr.position.y >= triggerPosY)
+        if (rightTrigger.position.y >= triggerPosY+5)
             goingUp = false;
-        if (tr.position.y <= triggerPosY - 12)
+        if (rightTrigger.position.y <= triggerPosY-5)
             goingUp = true;
 
+        if (leftTrigger.position.y >= triggerPosY + 5)
+            goingUp = true;
+        if (leftTrigger.position.y <= triggerPosY - 5)
+            goingUp = false;
+
         if (goingUp)
-            tr.Translate(Vector3.up * Time.deltaTime * 20);
+        {
+            rightTrigger.Translate(Vector3.up * Time.deltaTime * 20);
+            leftTrigger.Translate(Vector3.down * Time.deltaTime * 20);
+        }
         else
-            tr.Translate(Vector3.down * Time.deltaTime * 20);
+        {
+            rightTrigger.Translate(Vector3.down * Time.deltaTime * 20);
+            leftTrigger.Translate(Vector3.up * Time.deltaTime * 20);
+        }
     }
 
     //LStrans.position = LSpos;
