@@ -23,7 +23,7 @@ public class Menu : MonoBehaviour {
 
         if (!gameStart)
         {
-            if (Input.GetKeyDown(KeyCode.Escape))
+            if (Input.GetKeyDown(KeyCode.Escape) || Input.GetButtonDown("Pause"))
             {
                 menuActive = !menuActive;
             }
