@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour {
 
     private int movementIterator = 0;
 
+    public AudioSource audio;
+
     private Vector3 jump, startPosition, endPosition, input;
 
 	private Vector3 direction;
@@ -221,10 +223,12 @@ public class PlayerController : MonoBehaviour {
 				if (hit.collider.gameObject.name == "block") {
 					var block = hit.collider.gameObject.GetComponent<BlockController> ();
 					if (block.parent.CanMove (direction)) {
-						StartCoroutine (move (direction));
+                        audio.Play();
+                        StartCoroutine (move (direction));
 						block.parent.Move (direction, 1);
-						// can move and will push block
-						return;
+                        
+                        // can move and will push block
+                        return;
 					} else if (block.CanMantle ()) {
 						// can mantle
 						moveAndRise (direction);

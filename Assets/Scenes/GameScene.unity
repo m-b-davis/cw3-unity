@@ -940,6 +940,7 @@ MonoBehaviour:
   moveSpeed: 20
   rotateSpeed: 0
   jumpForce: 2.5
+  audio: {fileID: 1586046584}
 --- !u!136 &872856566
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -1031,7 +1032,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1417886019}
   - component: {fileID: 1417886020}
-  - component: {fileID: 1417886021}
   m_Layer: 0
   m_Name: Tutorial Controller
   m_TagString: Untagged
@@ -1072,20 +1072,6 @@ MonoBehaviour:
   leftStick: {fileID: 677833589}
   leftStickParent: {fileID: 75397242}
   controller: {fileID: 832662639}
-  LSpos: {x: 0, y: 0, z: 0}
---- !u!114 &1417886021
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1417886018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: accc73ed2e9e87241a7e5fbdebc7bfc0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  LS: {fileID: 677833589}
-  LSParent: {fileID: 75397242}
 --- !u!1 &1436988192
 GameObject:
   m_ObjectHideFlags: 0
