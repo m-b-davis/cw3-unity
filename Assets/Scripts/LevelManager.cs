@@ -29,7 +29,7 @@ public class LevelManager : MonoBehaviour {
 	public Text GoalIndicator;
 	public Text HeightIndicator;
 
-	private float difficultyIncreaseRate = 2f; // 1 = normal
+	private float difficultyIncreaseRate = 1f; // 1 = normal
 	private float difficulty = 0;
 	private int goalBlocks = 0;
 	private int score;
