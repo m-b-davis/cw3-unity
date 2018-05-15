@@ -5,9 +5,12 @@ using UnityEngine;
 public class CameraRotator : MonoBehaviour {
 
     public static int rotateDir = 0;
+    public GameObject player;
     private bool rotating = false;
 
 	void Update () {
+
+        transform.position = player.transform.position;
 
         /*if (Input.GetAxisRaw("Left Trigger") != 0)
         {
