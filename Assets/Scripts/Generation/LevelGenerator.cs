@@ -15,9 +15,14 @@ public class LevelGenerator : MonoBehaviour {
 	public GameObject WalkParent;
 
 	public FloorGenerator FloorGenerator;
+	private float singleTileProbability;
 
 	// Use this for initialization
 	void Start () {
+		var player = FindObjectOfType<PlayerController> ();
+		player.SpawnX = Random.Range (0, Width - 1);
+		player.SpawnZ = Random.Range (0, Length - 1);
+
 		FloorGenerator.GenerateFloor (Width, Length, wallHeight: 10);
 	}
 	
@@ -25,9 +30,16 @@ public class LevelGenerator : MonoBehaviour {
 	void Update () {
 		
 	}
+
+	public void ExpandSizeByOne() {
+		Width++;
+		Length++;
+		FloorGenerator.ExpandByOne();
+	}
 		
-	public GameObject[] GenerateLevel() {
-		var row = GenerateRow (this.Width, this.Length, this.NumWalks, this.WalkLength);
+	public GameObject[] GenerateLevelRow(float singleTileProbability, int maxWalkLength) {
+		this.singleTileProbability = singleTileProbability;
+		var row = GenerateRow (this.Width, this.Length, this.NumWalks, maxWalkLength);
 		int yPos = 20;
 		return this.InstantiateRow (row, yPos);
 	}
@@ -54,15 +66,19 @@ public class LevelGenerator : MonoBehaviour {
 		return pieces;
 	}
 
-	int[] PickStartPoint (int[,] row, int blank) {
-		int i1 = Random.Range (0, row.GetLength(0) - 1);
-		int i2 = Random.Range (0, row.GetLength(1) - 1);
+	int[] PickStartPoint (int[,] row, int blank, int recursionDepth = 10) {
+
+		if (recursionDepth == 0) {
+			return new int[] { -999, -999 };
+		}
+
+		int i1 = Random.Range (0, row.GetLength(0));
+		int i2 = Random.Range (0, row.GetLength(1));
 
 		if (row [i1, i2] == blank) {
 			return new int[]{ i1, i2 };
 		} else {
-			// Could hit recursion depth here
-			return this.PickStartPoint (row, blank);
+			return this.PickStartPoint (row, blank, recursionDepth - 1);
 		}
 	}
 		
@@ -99,31 +115,36 @@ public class LevelGenerator : MonoBehaviour {
 		return row [i1, i2] == blank;
 	}
 
-	int GetWalkLength() {
+	int GetWalkLength(int maxWalkLength) {
 		float random = Random.Range (0f, 1f);
 
-		if (random < 0.5)
+		if (random < this.singleTileProbability)
 			return 1;
 
 		if (random > 0.8) 
-			return Random.Range (3, 6);
+			return Random.Range (3, maxWalkLength);
 	
-		return Random.Range(1, 3);
+		return Random.Range(1, Mathf.RoundToInt(maxWalkLength/ 2));
 	}
 
 	Walk[] GenerateRow(int width, int length, int numWalks, int maxWalkLength) {
 		int[,] row = new int[width, length];
 
-		var walks = new Walk[numWalks];
+		var walks = new List<Walk> ();
 
 		int blankSymbol = 0;
 
 		for (int walkIndex = 0; walkIndex < numWalks; walkIndex++) {
 			int walkSymbol = walkIndex + 1;
 			int[] currentPosition = this.PickStartPoint (row, blankSymbol);
+			if (currentPosition [0] == -999) {
+				return walks.ToArray ();
+			}
+
 			row [currentPosition [0], currentPosition [1]] = walkSymbol;
 
-			int walkLength = GetWalkLength ();
+			int walkLength = GetWalkLength (maxWalkLength);
+
 			Walk walk = new Walk (currentPosition, walkSymbol);
 			for (int w = 1; w < walkLength; w++) {
 				int[][] validMoves = this.GetValidMoves (row, currentPosition[0], currentPosition[1], blankSymbol);
@@ -141,10 +162,10 @@ public class LevelGenerator : MonoBehaviour {
 				}
 			}
 
-			walks [walkIndex] = walk;
+			walks.Add (walk);
 		}
 
-		return walks;
+		return walks.ToArray ();
 	}
 
 	struct LevelRow {

@@ -41,12 +41,20 @@ public class BlockController : MonoBehaviour {
 				}
 			}
 
-			// ignore player 
+			var squareEmpty = hit.distance >= 0.6;
+
+			// ignore player if going downwards (or crush player)
 			if (hit.collider.gameObject.name == "player") {
+				if (direction == Vector3.down) {
+					if (!squareEmpty && parent.CanCrush) {
+						FindObjectOfType<LevelManager> ().PlayerCrushed ();
+					}
+					return squareEmpty;
+				}
 				return true;
 			}
 
-			return hit.distance >= 0.6;
+			return squareEmpty;
 		}
 
 		return true;

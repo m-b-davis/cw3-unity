@@ -12,6 +12,9 @@ public class Menu : MonoBehaviour {
     private bool menuActive = false;
 
     private BlurController blurController;
+	private LevelManager levelManager;
+	private PlayerController playerController;
+
 
 
     void Start () {
@@ -26,17 +29,28 @@ public class Menu : MonoBehaviour {
             if (Input.GetKeyDown(KeyCode.Escape) || Input.GetButtonDown("Pause"))
             {
                 menuActive = !menuActive;
+
+				GUICanvas.SetActive(!menuActive);
+				//gameObjects.SetActive(!menuActive);
+				MenuCanvas.SetActive(menuActive);
+
+				if (menuActive) {
+					Object[] objects = FindObjectsOfType<GameObject> ();
+
+					foreach (GameObject go in objects) {
+						go.SendMessage ("OnPauseGame", SendMessageOptions.DontRequireReceiver);
+					}
+
+					blurController.ShowBlur ();
+				} else {
+					Object[] objects = FindObjectsOfType<GameObject> ();
+					foreach (GameObject go in objects) {
+						go.SendMessage ("OnResumeGame", SendMessageOptions.DontRequireReceiver);
+					}
+					blurController.HideBlur ();
+				}
             }
-
-            GUICanvas.SetActive(!menuActive);
-            //gameObjects.SetActive(!menuActive);
-            MenuCanvas.SetActive(menuActive);
-
-            if (menuActive)
-                blurController.ShowBlur();
-            else
-                blurController.HideBlur();
-
+				
             /*if (menuActive)
                 camera.GetComponent<Camera>().cullingMask = 0;
             else

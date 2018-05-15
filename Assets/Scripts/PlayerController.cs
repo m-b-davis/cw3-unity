@@ -25,6 +25,11 @@ public class PlayerController : MonoBehaviour {
 
 	private LevelManager LevelManager;
 
+	public int SpawnX;
+	public int SpawnZ;
+
+	public bool FreezeInput = false;
+
 	// Use this for initialization
 	void Start () {
 		this.LevelManager = FindObjectOfType<LevelManager> ();
@@ -34,7 +39,7 @@ public class PlayerController : MonoBehaviour {
 	}
 		
 	void Spawn() {
-		this.gameObject.transform.position = new Vector3 (4, 0.5f, 4);
+		this.gameObject.transform.position = new Vector3 (SpawnX, 0.5f, SpawnZ);
 	}
 // 
 //	void HitBlock(Collision collision) {
@@ -58,6 +63,7 @@ public class PlayerController : MonoBehaviour {
 //		}
 //	}
 
+
 	void GetDirection(float x, float z){ 
 		var absX = Mathf.Abs (x);
 		var absZ = Mathf.Abs (z);
@@ -79,6 +85,8 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {
+		if (FreezeInput)
+			return;
 
         //DONE Check if "on grid" and readjust to nearest floor cube's x and z if not
         //TODO Add 4-D rotation using the second joystick and angle checker (might need direction indicator in-game)
@@ -105,23 +113,6 @@ public class PlayerController : MonoBehaviour {
         //left joystick angular check
         if (!isMoving)
         { //if not moving already, get requested direction of movement from input
-
-            /*Vector3 moveDirection = new Vector3(0, 0, 0);
-            float angle = Mathf.Atan2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical")) * Mathf.Rad2Deg;
-
-            if (0 <= angle && angle < 90) {
-                moveDirection = Vector3.forward;
-            } else if (90 <= angle && angle < 180) {
-                moveDirection = Vector3.left;
-            } else if (180 <= angle && angle < 270) {
-                moveDirection = Vector3.back;
-            } else if (270 <= angle && angle < 360) {
-                moveDirection = Vector3.right;
-            }
-
-            if (input != Vector3.zero)
-                StartCoroutine(move(moveDirection));
-            */
 
             float newX = x;
             float newZ = z;
@@ -158,14 +149,7 @@ public class PlayerController : MonoBehaviour {
                     else if (newZ < 0)
                         direction = -Vector3.right;
                 }
-
-				// raycast in target direction
-				// if no hit - move that way
-				// if block, check if block can move
-					// if it can, move that way
-					// else check if we can mantle
-
-
+					
 
 				if (input != Vector3.zero) {
 					TryMove (direction);
@@ -181,47 +165,40 @@ public class PlayerController : MonoBehaviour {
 
     }
 
-	public void TryMove(Vector3 direction) {
-		RaycastHit hit;
+	public void TryMove (Vector3 direction) {
+		RaycastHit hitFloor;
 		var transformDirection = transform.TransformDirection (direction);
 		Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * 1000, Color.red);
 
-		if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), transformDirection, out hit, Mathf.Infinity))
+		if (Physics.Raycast(transform.position + new Vector3(0, 0.5f, 0), transformDirection, out hitFloor, Mathf.Infinity))
 		{
-			
-			Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * hit.distance, Color.red, 1);
-			if (hit.distance >= 0.8) {
+			Debug.DrawRay(transform.position + new Vector3(0, 0.5f, 0), transformDirection * hitFloor.distance, Color.red, 1);
+			if (hitFloor.distance >= 0.8) {
 				// gap 
 				// check if block below
-				RaycastHit hit2;
+				RaycastHit hitBlockDown;
 
 
 				Debug.DrawRay(transform.position + direction, Vector3.down, Color.red, 2);
 
-				if (Physics.Raycast (transform.position + direction.normalized + new Vector3(0, 0.1f, 0), Vector3.down, out hit2, Mathf.Infinity)) {
-					Debug.DrawRay(transform.position + direction, Vector3.down * hit.distance, Color.green, 2);
+				if (Physics.Raycast (transform.position + direction.normalized + new Vector3(0, 0.1f, 0), Vector3.down, out hitBlockDown, Mathf.Infinity)) {
+					Debug.DrawRay(transform.position + direction, Vector3.down * hitBlockDown.distance, Color.green, 2);
 
-					if (hit2.distance > 0.6) {
-//						if (hit2.collider.gameObject.name == "block") {
-//							var block = hit2.collider.gameObject.GetComponent<BlockController> ();
-//							if (block.SquareEmpty (direction)) {
-								moveAndDrop (direction, Mathf.RoundToInt (hit2.distance));
-								return;
-							//}
-						//}
+					if (hitBlockDown.distance > 0.6) {
+						moveAndDrop (direction, Mathf.RoundToInt (hitBlockDown.distance));
+						return;
 					} else {
 						StartCoroutine (move (direction));
 						return;
 					}
-
 				}
 				// if block below ask block if it can move in that direciton
 				// if so, movedown
 				StartCoroutine (move (direction));
 				return;
 			} else {
-				if (hit.collider.gameObject.name == "block") {
-					var block = hit.collider.gameObject.GetComponent<BlockController> ();
+				if (hitFloor.collider.gameObject.name == "block") {
+					var block = hitFloor.collider.gameObject.GetComponent<BlockController> ();
 					if (block.parent.CanMove (direction)) {
                         audio.Play();
                         StartCoroutine (move (direction));
@@ -244,6 +221,18 @@ public class PlayerController : MonoBehaviour {
 		}
 
 	}
+
+
+	void OnPauseGame ()
+	{
+		FreezeInput = true;
+	}
+
+	void OnResumeGame ()
+	{
+		FreezeInput = false;
+	}
+
 
 	public void moveAndDrop(Vector3 moveDirection, int amount)
 	{
@@ -301,11 +290,11 @@ public class PlayerController : MonoBehaviour {
 		}
 
 		// If we get here, player has no possible moves
-		this.PlayerDied();
+		this.PlayerDied(CauseOfDeath.Checkmate);
 	}
 
-	private void PlayerDied() {
-		this.LevelManager.PlayerDied ();
+	private void PlayerDied(CauseOfDeath cause) {
+		this.LevelManager.PlayerDied (cause);
 	}
 }
 

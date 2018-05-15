@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class FloorGenerator : MonoBehaviour {
 
@@ -8,7 +9,14 @@ public class FloorGenerator : MonoBehaviour {
 	public GameObject BlackTilePrefab;
 	public GameObject WallPrefab;
 
+	private GameObject floorParent;
+	private GameObject wallsParent;
+
 	public LayerMask mask = -1;
+
+	private int width;
+	private int length;
+	private int wallHeight;
 
 	// Use this for initialization
 	void Start () {
@@ -21,11 +29,50 @@ public class FloorGenerator : MonoBehaviour {
 	}
 
 	public void GenerateFloor(int width, int length, int wallHeight) {
-		this.Generate (width, length);
-		this.AddBoundaryWalls (width, length, wallHeight);
+		this.width = width;
+		this.length = length;
+		this.wallHeight = wallHeight;
+
+		this.floorParent = this.Generate (width, length);
+		this.wallsParent = this.AddBoundaryWalls (width, length, wallHeight);
 	}
 
-	private void AddBoundaryWalls(int width, int length, int height) {
+	public void ExpandByOne() {
+		++width; ++length;
+
+		var newFloorParent = this.Generate (width, length);
+		var newWallsParent = this.AddBoundaryWalls (width, length, wallHeight);
+
+		ClearChildren (this.wallsParent.transform);
+		ClearChildren (this.floorParent.transform);
+
+		Destroy (this.wallsParent);
+		Destroy (this.floorParent);
+
+		this.wallsParent = newWallsParent;
+		this.floorParent = newFloorParent;
+	}
+
+	public void ClearChildren(Transform transform)
+	{
+		Debug.Log(transform.childCount);
+		int i = 0;
+
+		GameObject[] allChildren = new GameObject[transform.childCount];
+
+		foreach (Transform child in transform)
+		{
+			allChildren[i] = child.gameObject;
+			i += 1;
+		}
+
+		foreach (GameObject child in allChildren)
+		{
+			DestroyImmediate(child.gameObject);
+		}
+	}
+
+	private GameObject AddBoundaryWalls(int width, int length, int height) {
 		var walls = new GameObject("Floor Walls");
 
 		// north wall
@@ -74,9 +121,11 @@ public class FloorGenerator : MonoBehaviour {
 		westWall.transform.SetParent (walls.transform);
 
 		walls.transform.SetParent (this.transform);
+
+		return walls;
 	}
 
-	private void Generate(int width, int height) {
+	private GameObject Generate(int width, int height) {
 
 		var floorParent = new GameObject ("Floor");
 
@@ -90,5 +139,7 @@ public class FloorGenerator : MonoBehaviour {
 		}
 
 		floorParent.transform.SetParent (this.transform);
+
+		return floorParent;
 	}
 }

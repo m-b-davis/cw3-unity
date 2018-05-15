@@ -27,9 +27,19 @@ public class TutoController : MonoBehaviour
 
     private float startTime, journeyLength;
 
+	private static bool created = false;
+
+	void Awake()
+	{
+		if (!created)
+		{
+			DontDestroyOnLoad(this.gameObject);
+			created = true;
+		}
+	}
+		
 
     void Start() {
-
         LT = RT = LS = false;
         triggerPosY = leftTrigger.transform.position.y;
 

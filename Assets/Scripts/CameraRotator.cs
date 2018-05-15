@@ -45,7 +45,7 @@ public class CameraRotator : MonoBehaviour {
                 rotateDir = 270;
         }
 
-        transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(0, rotateDir, 0), 5 * Time.deltaTime);
+        transform.localRotation = Quaternion.Slerp(transform.localRotation, Quaternion.Euler(1, rotateDir, 1), 5 * Time.deltaTime);
 
     }
 
