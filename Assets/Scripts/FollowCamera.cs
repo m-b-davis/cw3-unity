@@ -18,8 +18,7 @@ public class FollowCamera: MonoBehaviour
 	}
 
 	void Start() {
-
-
+        
 	}
 
 	void FixedUpdate() {
@@ -43,6 +42,6 @@ public class FollowCamera: MonoBehaviour
 		var smoothedPosition = Vector3.Lerp (transform.position, desiredPosition, smoothSpeed);
 
 		transform.position = new Vector3 (transform.position.x, smoothedPosition.y, transform.position.z);
-	}
+    }
 }
 
