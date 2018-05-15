@@ -12,7 +12,7 @@ public class LevelManager : MonoBehaviour {
 
 	private LevelGenerator LevelGenerator;
 
-    public AudioSource gameOverAudio;
+    public AudioSource gameOverAudio, completeAudio;
 
     public float DropDelay;
 	public float DropDelayVariance;
@@ -29,7 +29,7 @@ public class LevelManager : MonoBehaviour {
 	public Text GoalIndicator;
 	public Text HeightIndicator;
 
-	private float difficultyIncreaseRate = 0.5f; // 1 = normal
+	private float difficultyIncreaseRate = 2f; // 1 = normal
 	private float difficulty = 0;
 	private int goalBlocks = 0;
 	private int score;
@@ -139,6 +139,7 @@ public class LevelManager : MonoBehaviour {
 		bool complete = numBlocks >= goalBlocks;
 
 		if (complete) {
+            completeAudio.Play();
 			rowPieces.ToList ().ForEach (piece => piece.RowComplete ());
 			IncreaseScore (CompleteRowScore);
 			CheckRowHeight (-1);
@@ -237,7 +238,7 @@ public enum DifficultyVariable {
 public static class DifficultyManager {
 	public static Dictionary<DifficultyVariable, float[]> DifficultyRanges = new Dictionary<DifficultyVariable, float[]> {
 		{ DifficultyVariable.MaxWalkLength, new float[] { 2f, 7f } },
-		{ DifficultyVariable.SingleBlockProbability, new float[] { 0.6f, 0.2f } },
+		{ DifficultyVariable.SingleBlockProbability, new float[] { 0.5f, 0.2f } },
 		{ DifficultyVariable.DropSpeed, new float[] { 4f, 10f } },
 		{ DifficultyVariable.DropDelay, new float[] { 5f, 1f } },
 		{ DifficultyVariable.RowCompleteThreshold, new float[] { 0.45f, 0.8f } },
