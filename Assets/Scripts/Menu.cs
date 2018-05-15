@@ -6,6 +6,8 @@ public class Menu : MonoBehaviour {
 
     public GameObject GUICanvas, MenuCanvas, StartCanvas, camera, gameComponents;
 
+    public AudioSource audio;
+
     public static bool gameStart = true;
     private bool menuActive = false;
 
@@ -49,6 +51,7 @@ public class Menu : MonoBehaviour {
 
             if (Input.anyKeyDown)
             {
+                audio.Play();
                 gameStart = false;
                 StartCanvas.SetActive(false);
                 GUICanvas.SetActive(true);
