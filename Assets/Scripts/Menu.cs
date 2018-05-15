@@ -8,9 +8,12 @@ public class Menu : MonoBehaviour {
 
     private bool menuActive = false;
 
-	void Start () {
-		
-	}
+    private BlurController blurController;
+
+
+    void Start () {
+        blurController = FindObjectOfType<BlurController>();
+    }
 	
 
 	void Update () {
@@ -24,9 +27,9 @@ public class Menu : MonoBehaviour {
         MenuCanvas.SetActive(menuActive);
 
         if (menuActive)
-        {
-
-        }
+            blurController.ShowBlur();
+        else
+            blurController.HideBlur();
 
         /*if (menuActive)
             camera.GetComponent<Camera>().cullingMask = 0;
